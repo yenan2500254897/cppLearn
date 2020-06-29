@@ -92,8 +92,39 @@ string getHappyString(int n, int k) {
     return "";
 }
 
+int getTotal(int n){
+    return 3*(1<<(n-1));
+}
+string getHappyStringSec(int n, int k) {
+    int total = getTotal(n);
+    if(k>total){
+        return "";
+    }
+
+    int len = 0;
+    vector<char> result(n, ' ');
+    for(int i=0;i<n;i++){
+        if(i==0){
+            int m = k*3/(total+1);
+            result[0] = 'a'+ m;
+            k = k-m*total/3;
+        }else{
+            char pre = result[i-1];
+            if(k<=(1<<(n-i-1))){
+                result[i] = (pre == 'a'? 'b':'a');
+            }else{
+                result[i] = (pre == 'c'? 'b':'c');
+                k = k - (1<<(n-i-1));
+            }
+        }
+        //cout<< "index "<< i <<": " << result[i] <<endl;
+    }
+    return string(result.begin(), result.end());
+}
+
+
 int main(){
     int n=3;
     int k=9;
-    cout << getHappyString(n, k) << endl;
+    cout << getHappyStringSec(n, k) << endl;
 }
