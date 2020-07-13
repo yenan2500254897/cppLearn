@@ -2,23 +2,25 @@
 #include<vector>
 #include<queue>
 using namespace std;
+//边界：联通分量中，非被包围的点
 vector<vector<int> > colorBorder(vector<vector<int> >& grid, int r0, int c0, int color) {
     int row = grid.size();
     int col = grid[0].size();
+    vector<vector<int> > result(grid.begin(), grid.end()); 
     //用于记录哪些位置被访问过
     vector<vector<bool> > visited(row, vector<bool>(col, false));
     //用于广度优先搜索
-    queue<int*> assistant;
+    queue<vector<int> > assistant;
     //方向
     int dir[4][2] = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}}; 
 
     //初始化
-    int init[2] = {r0, c0};
+    vector<int> init = {r0, c0};
     assistant.push(init);
     visited[r0][c0] = true;
 
     while(!assistant.empty()){
-        int* cur = assistant.front();
+        vector<int> cur = assistant.front();
         assistant.pop();
 
         int r = cur[0];
@@ -26,9 +28,9 @@ vector<vector<int> > colorBorder(vector<vector<int> >& grid, int r0, int c0, int
 
         int precolor = grid[r][c];
         cout<<"r:"<<r<<"  c:"<<c<<endl;
-        if(r == 0 || r == row-1 || c==0 || c==col-1){
-            cout<<"case 1 change "<<"r:"<<r<<"  c:"<<c<< " color: "<<color<<endl;
-            grid[r][c] = color;
+
+        if(r==0 || r==row-1 || c==0 || c== col-1){
+            result[r][c] = color;
         }
         //不在边界，但是在联通分量的边界
         bool flag = true;
@@ -40,18 +42,23 @@ vector<vector<int> > colorBorder(vector<vector<int> >& grid, int r0, int c0, int
             if(nextR>=0 && nextR<row && nextC>=0 && nextC<col
             && visited[nextR][nextC] == false && precolor == grid[nextR][nextC]){
                 cout<<"add r:"<<nextR<<"  c:"<<nextC<<endl;
-                flag = false;
                 visited[nextR][nextC] = true;
-                int temp[2] = {nextR, nextC};
+                vector<int> temp = {nextR, nextC};
                 assistant.push(temp);
             }
+
+            if(r>0 && r<row-1 && c>0 && c<col-1){
+                if(precolor != grid[nextR][nextC]){
+                    flag = false;
+                }
+            }
         }
-        if(flag ){
+        if(!flag ){
             cout<<"case 2 change "<<"r:"<<r<<"  c:"<<c<< " color: "<<color<<endl;
-            grid[r][c] = color;
+            result[r][c] = color;
         }
     }
-    return grid;
+    return result;
 
 }
 
