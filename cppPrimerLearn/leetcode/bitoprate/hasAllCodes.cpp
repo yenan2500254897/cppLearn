@@ -1,6 +1,7 @@
 #include<iostream>
 #include<set>
 #include<string>
+#include<unordered_set>
 using namespace std;
 
 // bool hasAllCodes(string s, int k) {
@@ -25,23 +26,20 @@ using namespace std;
 
 
 bool hasAllCodes(string s, int k) {
-    if(k>s.size()){
+    if(k>=s.size()){
+
         return false;
     }
-    set<int> record;
+    
+    unordered_set<string> record;
     for(int i=0;i<=s.size()-k;i++){
-        string str(s.begin()+i, s.begin()+i+k);
-        int value = stoi(str, 0, 2);
-        record.insert(value);
+        
+        record.insert(s.substr(i, k));
     }
 
     int limit = (1<<k);
-    for(int j=0;j<limit;j++){
-        if(record.count(j) == 0){
-            return false;
-        }
-    }
-    return true;
+    
+    return record.size() == limit;
 }
 
 int main(){
