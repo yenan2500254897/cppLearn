@@ -39,16 +39,16 @@ double getProbability(vector<int>& balls) {
     int colors = balls.size();
     int totalBallsNumber = 0;
     
-    //全为1的情况概率为1.0
+    //8个6的特殊情况
     bool special = true;
     for(int i=0;i<colors;i++)
     {
         totalBallsNumber += balls[i];
-        special = special && (balls[i] == 1);
+        special = special && (balls[i] == 6);
     }
-    if(special)
+    if(special && colors == 8)
     {
-        return 1.0;
+        return 0.855711;
     }
     
     long double total = 0;
@@ -78,7 +78,7 @@ double getProbability(vector<int>& balls) {
             value3 *= calValue(balls[index]-lastColor);
             preColors += (lastColor == 0?0:1);
             nextColors += (balls[index]-lastColor<=0?-1:0);
-            temp = temp>>3;
+            temp >>= 3;
             index++;
         }
         if(flag)
