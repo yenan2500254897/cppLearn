@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<algorithm>
 
 /*
 327. 区间和的个数
@@ -9,6 +10,8 @@
 说明:
 最直观的算法复杂度是 O(n2) ，请在此基础上优化你的算法。
 
+思路：将nums[i...j]分为nums[i...k]与nums[k+1...j]两个部分，分别求出nums[i...k]与nums[k+1...j]满足条件的区间数目，
+然后求存在的sum(nums[n...k])+sum(nums[k+1...m])满足条件的区间数目。
 来源：力扣（LeetCode）
 */
 using namespace std;
@@ -17,9 +20,9 @@ int findSolution(vector<int>& nums, int lower, int upper, int leftIndex, int rig
 {
     if(leftIndex==rightIndex)
     {
-        int result = nums[leftIndex]>=lower && nums[leftIndex]<=upper?1:0;
+        int temp = (nums[leftIndex]>=lower && nums[leftIndex]<=upper?1:0);
         //cout<<"left:="<<leftIndex<<"  right:="<<rightIndex<<"   result:="<<result<<endl;
-        return result;
+        return temp;
     }
 
     int result = 0;
@@ -41,11 +44,21 @@ int findSolution(vector<int>& nums, int lower, int upper, int leftIndex, int rig
         rightVector[i-mid-1] = rightVector[i-mid-2] + nums[i];
     }
 
-    for(long left:leftVector)
+    sort(leftVector.begin(), leftVector.end());
+    sort(rightVector.begin(), rightVector.end());
+
+    for(auto left:leftVector)
     {
-        for(long right:rightVector)
+        //剪枝，避免超时
+        if(left+rightVector.back()<lower || left+rightVector.front()>upper)
         {
-            if(left+right>=lower && left+right<=upper)
+            continue;
+        }
+
+        for(auto right:rightVector)
+        {
+            long total = left+right;
+            if(total>=lower && total<=upper)
             {
                 result++;
             }
@@ -65,8 +78,13 @@ int countRangeSum(vector<int>& nums, int lower, int upper)
 
 int main()
 {
-    vector<int> nums = {-2,5,-1};
-    int lower = -2;
-    int upper = 2;
+    // vector<int> nums = {-2,5,-1};
+    // int lower = -2;
+    // int upper = 2;
+
+    vector<int> nums = {-2,0,1,-1};
+    int lower = 1;
+    int upper = 4;
+    
     cout<<countRangeSum(nums, lower, upper)<<endl;
 }
