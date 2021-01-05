@@ -47,6 +47,8 @@ int findSolution(vector<int>& nums, int lower, int upper, int leftIndex, int rig
     sort(leftVector.begin(), leftVector.end());
     sort(rightVector.begin(), rightVector.end());
 
+    int l=0;
+    int r=rightVector.size()-1;
     for(auto left:leftVector)
     {
         //剪枝，避免超时
@@ -55,14 +57,27 @@ int findSolution(vector<int>& nums, int lower, int upper, int leftIndex, int rig
             continue;
         }
 
-        for(auto right:rightVector)
+        if(l==0)
         {
-            long total = left+right;
-            if(total>=lower && total<=upper)
+            while(l<rightVector.size() && left+rightVector[l]<lower)
             {
-                result++;
+                l++;
             }
         }
+        else
+        {
+            while(l-1>=0 && left+rightVector[l-1]>=lower)
+            {
+                l--;
+            }
+        }
+
+        while(r>=0 && left+rightVector[r]>upper)
+        {
+            r--;
+        }
+        result += (r-l+1);
+        
     }
     //cout<<"left:="<<leftIndex<<"  right:="<<rightIndex<<"   result:="<<result<<endl;
     return result;
