@@ -61,18 +61,6 @@ int maxIndex = -1;
 int maxValue = -1;
 int findSolution(int target, int left, int right, MountainArray &mountainArr)
 {
-    //比最大值大
-    if(target>maxValue)
-    {
-        cout<<"case0:  left:= "<<left<<"  right:="<<right<<"  result:="<<-1<<endl;
-        return -1;
-    }
-    //等于最大值
-    if(target == maxValue)
-    {
-        //cout<<"case1:  left:= "<<left<<"  right:="<<right<<"  result:="<<maxIndex<<endl;
-        return maxIndex;
-    }
     //比最大值小
     int leftValue = mountainArr.get(left);
     int rightValue = mountainArr.get(right);
@@ -172,6 +160,18 @@ int findInMountainArray(int target, MountainArray &mountainArr) {
     int leftIndex = 0;
     int rightIndex = mountainArr.length()-1;
     findMax(target, leftIndex, rightIndex, mountainArr);
+    //比最大值大
+    if(target>maxValue)
+    {
+        cout<<"case0:  left:= "<<left<<"  right:="<<right<<"  result:="<<-1<<endl;
+        return -1;
+    }
+    //等于最大值
+    if(target == maxValue)
+    {
+        //cout<<"case1:  left:= "<<left<<"  right:="<<right<<"  result:="<<maxIndex<<endl;
+        return maxIndex;
+    }
     //cout<<"maxIndex :="<<maxIndex<<"   maxValue :="<<maxValue<<endl;
     return findSolution(target, leftIndex, rightIndex, mountainArr);
 }
