@@ -2,6 +2,7 @@
 #include<vector>
 #include<set>
 #include<map>
+#include<algorithm>
 
 /*
 1649. 通过指令创建有序数组
@@ -17,6 +18,9 @@ nums 中 严格大于  instructions[i] 的数字数目。
 思路：区间树
 先用set求出instructions中各个唯一数，且对他们排好顺序。
 用input[i]表示set中第i个数number的个数，通过query(input, i-1)求出当前小于number的数的个数，用query(input, set.size()) - query(input, i)表示当前大于number的数的个数。
+
+改进：
+set存在扩容问题，直接用input[i]表示instructions中的值为i的数的个数
 */
 using namespace std;
 
@@ -40,32 +44,52 @@ void update(vector<long>& input, int index, int value)
     }
 }
 
+// int createSortedArray(vector<int>& instructions) 
+// {
+//     set<int> tempSet;
+//     tempSet.insert(instructions.begin(), instructions.end());
+//     int index = 1;
+//     map<int,int> assistant;
+//     for(auto item:tempSet)
+//     {
+//         assistant[item] = index;
+//         index++;
+//     }
+
+//     vector<long> input(tempSet.size()+1, 0);
+
+//     long cost = 0;
+//     for(int i=0;i<instructions.size();i++)
+//     {
+//         int value = instructions[i];
+//         int valueIndex = assistant[value];
+        
+//         int total = query(input, input.size()-1);
+//         int left = valueIndex-1==0?0:query(input, valueIndex-1);
+//         int right = total - query(input, valueIndex);
+
+//         cost += min(left, right);
+//         update(input, valueIndex, 1);
+//     }
+//     int mod = 1000000007;
+//     return cost%mod;
+// }
+
 int createSortedArray(vector<int>& instructions) 
 {
-    set<int> tempSet;
-    tempSet.insert(instructions.begin(), instructions.end());
-    int index = 1;
-    map<int,int> assistant;
-    for(auto item:tempSet)
-    {
-        assistant[item] = index;
-        index++;
-    }
-
-    vector<long> input(tempSet.size()+1, 0);
+    int maxValue = *max_element(instructions.begin(), instructions.end());
+    vector<long> input(maxValue+1, 0);
 
     long cost = 0;
     for(int i=0;i<instructions.size();i++)
     {
         int value = instructions[i];
-        int valueIndex = assistant[value];
         
-        int total = query(input, input.size()-1);
-        int left = valueIndex-1==0?0:query(input, valueIndex-1);
-        int right = total - query(input, valueIndex);
+        int left = value-1==0?0:query(input, value-1);
+        int right = i - query(input, value);
 
         cost += min(left, right);
-        update(input, valueIndex, 1);
+        update(input, value, 1);
     }
     int mod = 1000000007;
     return cost%mod;
