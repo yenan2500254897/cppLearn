@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
 #include<map>
+#include <cstring>
 
 /*
 992. K 个不同整数的子数组
@@ -14,6 +15,8 @@
 思路：
 1.用一个右侧递增的窗口[l...r]，当该窗口中的不同字符数等于K时，判断[l...r]中有多少个子数组[m, r]满足不同字符数等于K的条件
 2.当该窗口中的不同字符数大于K时，窗口[l...r]的左端递增，直到最新的[newL, r]满足不同字符数等于K
+
+优化：map频繁的插入和删除，可能会有扩缩容问题，导致超时，这里完全可以用一个数组记录数i的个数，diff记录不同的字符数。
 */
 using namespace std;
 
@@ -23,45 +26,48 @@ int subarraysWithKDistinct(vector<int>& A, int K)
     int left = 0;
     int right = 0;
     int result = 0;
-    map<int, int> record;
-    map<int, int> temp;
+    int record[len+1];
+    int temp[len+1];
+    memset(record, 0, (len+1)*sizeof(int));
+    memset(temp, 0, (len+1)*sizeof(int));
+
+    int diff = 0;
+    
     while(right<len)
     {
         if(right<len)
         {
             int rValue = A[right];
-            if(record.count(rValue) == 0)
+            if(record[rValue] == 0)
             {
-                record[rValue] = 1;
+                diff++;
             }
-            else
-            {
-                record[rValue] += 1;
-            }
+            record[rValue]++;
             right++;
         }
 
-        if(record.size()>K)
+        if(diff>K)
         {
-            while(record.size()!=K)
+            while(diff!=K)
             {
                 int value = A[left];
                 record[value] -= 1;
                 if(record[value] == 0)
                 {
-                    record.erase(value);
+                    diff--;
                 }
                 left++;
             }
         }
 
-        if(record.size() == K)
+        if(diff == K)
         {
-            temp = record;
+            memcpy(temp, record, (len+1)*sizeof(int));
             int tempLeft = left;
-            while(temp.size() == K)
+            int tempDiff = diff;
+            while(tempDiff == K)
             {
-                if(temp.size() == K)
+                if(tempDiff == K)
                 {
                     result += 1;
                 }
@@ -69,7 +75,7 @@ int subarraysWithKDistinct(vector<int>& A, int K)
                 temp[lValue] -= 1;
                 if(temp[lValue] == 0)
                 {
-                    temp.erase(lValue);
+                    tempDiff--;
                 }
                 tempLeft++;
             }
