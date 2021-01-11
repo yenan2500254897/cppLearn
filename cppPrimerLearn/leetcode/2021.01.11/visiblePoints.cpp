@@ -44,7 +44,7 @@ int visiblePoints(vector<vector<int>>& points, int angle, vector<int>& location)
 
     int right=0;
     int result = 0;
-    for(int left = 0;left<dp.size();left++)
+    for(int left = 0;left<len;left++)
     {
         while(right<dp.size() && dp[right] - dp[left] <= angle)
         {
