@@ -1,6 +1,8 @@
 #include<iostream>
 #include<string>
 #include<vector>
+#include<set>
+#include<map>
 
 /*
 1178. 猜字谜
@@ -15,50 +17,41 @@
 
 来源：力扣（LeetCode）
 思路：将word和puzzles都转换为整数number， number的二进制中的第i位（从右往左）表示'a'+i是否存在，然后两个判断条件用位与即可判断。
+加速：puzzles每个元素都只有七个字符，列举出全部情况为2^7.
 */
 using namespace std;
 vector<int> findNumOfValidWords(vector<string>& words, vector<string>& puzzles) 
 {
-    vector<int> transferWords(words.size(), 0);
-    vector<int> transferPuzzles(puzzles.size(), 0);
-    vector<int> firstCharacter(puzzles.size(), 0);
+    // int len = (1<<31);
+    // vector<int> dp(len, 0);
+    map<int, int> record;
 
-    int index = 0;
     int temp = 0;
-    for(string item:words)
+    int next = 0;
+    for(int i=0;i<words.size();i++)
     {
-        for(char ch:item)
+        temp = 0;
+        for(char ch:words[i])
         {
             temp |= (1<<(ch-'a'));
         }
-        transferWords[index] = temp;
-        index++;
-        temp = 0;
-    }
-
-    index = 0;
-    temp = 0;
-    for(string item:puzzles)
-    {
-        for(char ch:item)
-        {
-            temp |= (1<<(ch-'a'));
-        }
-        transferPuzzles[index] = temp;
-        firstCharacter[index] = (1<<(item[0]-'a'));
-        index++;
-        temp = 0;
+        record[temp] += 1;
     }
 
     vector<int> result(puzzles.size(), 0);
-    for(int i=0;i<puzzles.size();i++)
+    for(int j=0;j<puzzles.size();j++)
     {
-        for(int j=0;j<words.size();j++)
+        temp = 0;
+        for(auto ch:puzzles[j])
         {
-            if((transferWords[j] & firstCharacter[i])!=0
-            && (transferWords[j] & transferPuzzles[i]) == transferWords[j])
+            temp |= (1<<(ch-'a'));
+        }
+
+        for(int k=temp;k;k=(k-1)&temp)
+        {
+            if((k & (1<<(puzzles[j][0]-'a')))!=0)
             {
-                result[i]++;
+                result[j] += record[k];
             }
         }
     }
