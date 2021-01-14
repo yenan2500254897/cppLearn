@@ -14,114 +14,69 @@
 返回答案数组 ans ， answer[i] 应等于第 i 次查询 queries[i] 的结果，1 表示照亮，0 表示未照亮。
 
 来源：力扣（LeetCode）
+
+思路：
+平行于x轴的线为 y=a,平行于y轴的线为 x=b,对角线和反对角线可以用x-y=c与x+y=d来表示。
 */
 using namespace std;
 
 long long cal(int row, int col, int N)
 {
-    return (long long)row*N + col;
+    long long result = (long long)row*N + col;
+    return result;
 }
-
-bool isValid(int row, int col, int N, set<long long>& record)
-{
-    long long next = 0;
-    //计算行
-    for(int i=0;i<N;i++)
-    {
-        next = cal(row, i, N);
-        if(record.count(next)!=0)
-        {
-            return true;
-        }
-    }
-
-    //计算列
-    for(int j=0;j<N;j++)
-    {
-        next = cal(j, col, N);
-        if(record.count(next)!=0)
-        {
-            return true;
-        }
-    }
-
-    //计算对角线
-    for(int m=1;m<N;m++)
-    {
-        if(row-m>=0 && col-m>=0)
-        {
-            next = cal(row-m, col-m, N);
-            if(record.count(next)!=0)
-            {
-                return true;
-            }
-        }
-        if(row+m<N && col+m<N)
-        {
-            next = cal(row+m, col+m, N);
-            if(record.count(next)!=0)
-            {
-                return true;
-            }
-        }
-    }
-
-    //计算反对角线
-    for(int m=1;m<N;m++)
-    {
-        if(row-m>=0 && col+m<N)
-        {
-            next = cal(row-m, col+m, N);
-            if(record.count(next)!=0)
-            {
-                return true;
-            }
-        }
-        if(row+m<N && col-m>=0)
-        {
-            next = cal(row+m, col-m, N);
-            if(record.count(next)!=0)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
 vector<int> gridIllumination(int N, vector<vector<int>>& lamps, vector<vector<int>>& queries) 
 {
-    set<long long> record;
+    map<int, set<long long>> rowRecord;
+    map<int, set<long long>> colRecord;
+    map<int, set<long long>> diagRecord;
+    map<int, set<long long>> backdiagRecord;
+    set<long long> exist;
+    int row=0;
+    int col=0;
+    long long order=0;
     for(auto item:lamps)
     {
-        long long value = cal(item[0], item[1], N);
-        //cout<<"insert:="<<value<<endl;
-        record.insert(value);
+        row = item[0];
+        col = item[1];
+        order = cal(row, col, N);
+        rowRecord[row].insert(order);
+        colRecord[col].insert(order);
+        backdiagRecord[row+col].insert(order);
+        diagRecord[row-col].insert(order);
+        exist.insert(order);
     }
 
     vector<int> result(queries.size(), 0);
     for(int i=0;i<queries.size();i++)
     {
-        int row = queries[i][0];
-        int col = queries[i][1];
-        if(isValid(row, col, N, record))
+        row = queries[i][0];
+        col = queries[i][1];
+        if((rowRecord.count(row) !=0 && !rowRecord[row].empty()) 
+        || (colRecord.count(col) !=0 && !colRecord[col].empty())
+        || (backdiagRecord.count(row+col) !=0 && !backdiagRecord[row+col].empty()) 
+        || (diagRecord.count(row-col) !=0 && !diagRecord[row-col].empty()))
         {
             //cout<<"find row:="<<row<<" col:="<<col<<endl;
             result[i] = 1;
-            //删除周围八个因为cur照亮的灯
+            //删除周围亮着的灯
             for(int r=-1;r<=1;r++)
             {
                 for(int c=-1;c<=1;c++)
                 {
                     int nextRow = row+r;
                     int nextCol = col+c;
+                    //周围的灯的坐标要符合范围
                     if(nextRow>=0 && nextRow<N && nextCol>=0 && nextCol<N)
                     {
-                        long long next = cal(nextRow, nextCol, N);
-                        if(record.count(next)!=0)
+                        order = cal(nextRow, nextCol, N);
+                        if(exist.count(order)!=0)
                         {
-                            record.erase(next);
-                            //cout<<"erase row:="<<nextRow<<" col:="<<nextCol<<endl;
+                            rowRecord[nextRow].erase(order);
+                            colRecord[nextCol].erase(order);
+                            backdiagRecord[nextRow+nextCol].erase(order);
+                            diagRecord[nextRow-nextCol].erase(order);
+                            exist.erase(order);
                         }
                     }
                 }
