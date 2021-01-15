@@ -1,6 +1,7 @@
 #include<iostream>
 #include<vector>
-#include<set>
+#include<queue>
+#include<algorithm>
 #include<map>
 
 /*
@@ -10,87 +11,73 @@
 请你找出 yi + yj + |xi - xj| 的 最大值，其中 |xi - xj| <= k 且 1 <= i < j <= points.length。
 
 题目测试数据保证至少存在一对能够满足 |xi - xj| <= k 的点。
-
+对于j>i && xj-xi<=k时，yi + yj + |xi - xj|= (yj + xj) + (yi-xi),分别求两者的最大值即可。
+补充：max_element为左闭右开，即[left, right)范围的最大值。
 来源：力扣（LeetCode）
 */
 using namespace std;
+// int findMaxValueOfEquation(vector<vector<int>>& points, int k) 
+// {
+//     int len = points.size();
+//     int left = 0;
+//     int right = 0;
+//     int result = INT_MIN;
+//     while(left<len)
+//     {
+//         if(right+1<len && points[right+1][0]-points[left][0]<=k)
+//         {
+//             right++;
+//             continue;
+//         }
+
+//         //超时原因在这里，判断points[j][0]-points[i][0]+points[j][1]+points[i][1]的最大值时用的暴力法
+//         for(int i=left;i<right;i++)
+//         {
+//             for(int j=i+1;j<=right;j++)
+//             {
+//                 result = max(result, points[j][0]-points[i][0]+points[j][1]+points[i][1]);
+//             }
+//         }
+//         if(points[left][0] == points[right][0])
+//         {
+//             left = right+1;
+//             right = left;
+//         }
+//         else
+//         {
+//             int temp = points[left][0];
+//             while(temp == points[left][0])
+//             {
+//                 left++;
+//             }
+//         }
+        
+//     }
+//     return result;
+// }
+
 int findMaxValueOfEquation(vector<vector<int>>& points, int k) 
 {
     int len = points.size();
-    int left = 0;
-    int right = 0;
     int result = INT_MIN;
-    while(left<len)
+    priority_queue<pair<int,int>> record;
+    for(int i=0;i<len;i++)
     {
-        if(right+1<len && points[right+1][0]-points[left][0]<=k)
+        while(!record.empty() && record.top().second+k<points[i][0])
         {
-            right++;
-            continue;
+            record.pop();
         }
-
-        //超时原因在这里，判断points[j][0]-points[i][0]+points[j][1]+points[i][1]的最大值时用的暴力法
-        for(int i=left;i<right;i++)
+        if(!record.empty())
         {
-            for(int j=i+1;j<=right;j++)
-            {
-                result = max(result, points[j][0]-points[i][0]+points[j][1]+points[i][1]);
-            }
+            int value = record.top().first;
+            result = max(result, value+points[i][1]+points[i][0]);
+            //cout<<"i:="<<i<<"  left:="<<left<<"  value:="<<value<<"  result:="<<result<<endl;
         }
-        if(points[left][0] == points[right][0])
-        {
-            left = right+1;
-            right = left;
-        }
-        else
-        {
-            int temp = points[left][0];
-            while(temp == points[left][0])
-            {
-                left++;
-            }
-        }
+        record.push({points[i][1]-points[i][0], points[i][0]});
         
     }
     return result;
 }
-
-// int findMaxValueOfEquation(vector<vector<int>>& points, int k) 
-// {
-//     int result = INT_MIN;
-//     map<int, int> dp;
-//     dp[0] = points[0][1];
-//     set<int> record;
-//     record.insert(0);
-//     for(int i=1;i<points.size();i++)
-//     {
-//         int diff = points[i][0]-points[i-1][0];
-//         set<int> tempSet;
-//         map<int, int> tempDp;
-//         for(auto item:record)
-//         {
-//             if(item+diff<=k)
-//             {
-//                 result = max(result, points[i][1]+dp[item]+item+diff);
-
-//                 tempDp[item+diff] = max(dp[item], points[i][1]);
-//                 tempSet.insert(item+diff);
-//             }
-//         }
-
-//         dp = tempDp;
-//         record=tempSet;
-//         if(record.empty())
-//         {
-//             dp[0] = points[i][1];
-//             record.insert(0);
-//         }
-//         // for(auto item:tempSet)
-//         // {
-//         //     cout<<"i:="<<i<<"  value1:="<<item<<"  value2:="<<dp[item]<<endl;
-//         // }
-//     }
-//     return result;
-// }
 
 int main()
 {
