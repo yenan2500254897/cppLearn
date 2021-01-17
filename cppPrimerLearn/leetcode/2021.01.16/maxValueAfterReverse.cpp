@@ -8,6 +8,7 @@
 你可以选择给定数组的任意子数组，并将该子数组翻转。但你只能执行这个操作 一次 。
 
 请你找到可行的最大 数组值 。
+思路：参考 https://leetcode-cn.com/problems/reverse-subarray-to-maximize-array-value/solution/tan-xin-suan-fa-onshi-jian-fu-za-du-o1kong-jian-fu/
 
 来源：力扣（LeetCode）
 */
@@ -22,28 +23,23 @@ int maxValueAfterReverse(vector<int>& nums)
         total += abs(nums[i]-nums[i+1]);
     }
 
-    int diff = INT_MIN;
-    for(int i=0;i<len;i++)
+    int low = INT_MIN;
+    int high = INT_MAX;
+    int diff1 = INT_MIN;
+    int diff2 = INT_MIN;
+    for(int i=0;i<len-1;i++)
     {
-        for(int j=i+1;j<len;j++)
-        {
-            int value1=0;
-            int value2=0;
-            if(i-1>=0)
-            {
-                value1 += abs(nums[i-1]-nums[i]);
-                value2 += abs(nums[i-1]-nums[j]);
-            }
-            if(j+1<len)
-            {
-                value1 += abs(nums[j+1]-nums[j]);
-                value2 += abs(nums[j+1]-nums[i]);
-            }
-            diff = max(diff, value2-value1);
-        }
+        low = max(low, min(nums[i], nums[i+1]));
+        high = min(high, max(nums[i], nums[i+1]));
+
+        diff1 = max(diff1, abs(nums[i+1]-nums[0])-abs(nums[i+1]-nums[i]));
+        diff2 = max(diff2, abs(nums[len-1]-nums[i])-abs(nums[i+1]-nums[i]));
+
     }
-    return total+diff;
+    int result = max(total+2*(low-high), max(total+diff1, total+diff2));
+    return result;
 }
+
 
 int main()
 {
